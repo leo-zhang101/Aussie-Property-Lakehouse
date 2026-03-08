@@ -1,185 +1,139 @@
-# Aussie Property Lakehouse
+# Aussie Property Lakehouse Pipeline
 
-This project implements an end-to-end data engineering pipeline for analysing Australian property prices and population density. The pipeline ingests raw datasets, processes them through multiple transformation stages, and loads the final analytical dataset into a PostgreSQL data warehouse.
+This project implements an end-to-end batch data engineering pipeline for Australian Bureau of Statistics (ABS) building approvals data.
 
-The purpose of this project is to demonstrate a simplified lakehouse-style data architecture and show how raw data can be transformed into analytics-ready datasets using Python, SQL, and containerised databases.
+The pipeline ingests raw ABS Excel workbooks, processes them through Bronze, Silver, and Gold layers, applies basic data quality checks, and loads the final curated dataset into PostgreSQL. Workflow orchestration is handled with Apache Airflow and the environment runs in Docker.
 
----
-
-## Project Overview
-
-Housing affordability is a major economic and social issue in Australia, particularly in large metropolitan areas such as Sydney and Melbourne. Understanding how housing prices relate to population density can provide insights into urban development patterns and property market dynamics.
-
-This project combines two datasets:
-
-- Property price data by suburb
-- Population density data by suburb
-
-After cleaning and transformation, the datasets are joined to produce an analytical dataset that enables exploration of how property prices relate to urban density.
-
----
+The project was built to simulate a practical analytics engineering workflow using a layered data architecture and reproducible orchestration.
 
 ## Architecture
 
-The pipeline follows a layered architecture inspired by the modern lakehouse approach.
+```mermaid
+flowchart TD
+    A[ABS Building Approvals ZIP/XLSX Files] --> B[Bronze Layer - Raw Ingestion]
+    B --> C[Silver Layer - Cleaned and Standardised Data]
+    C --> D[Gold Layer - Analytics Ready Dataset]
+    D --> E[PostgreSQL Data Warehouse]
+    E --> F[Analytics / SQL Query Layer]
 
-Raw Data → Bronze Layer → Silver Layer → Gold Layer → PostgreSQL Analytics Table
+    G[Apache Airflow DAG] --> B
+    G --> C
+    G --> D
+    G --> E
+```
 
-Layer responsibilities:
+## Airflow DAG
 
-Bronze Layer  
-Raw ingestion of source datasets without modification.
+```mermaid
+flowchart LR
+    A[unzip_abs_zip] --> B[ingest_abs_batch]
+    B --> C[clean_abs_batch]
+    C --> D[build_gold_batch]
+    D --> E[quality_check_batch]
+    E --> F[load_to_postgres_batch]
+```
 
-Silver Layer  
-Data cleaning, formatting, and schema standardisation.
+## Pipeline Overview
 
-Gold Layer  
-Creation of an analytics-ready dataset combining property prices and population density.
+The pipeline follows a simple layered design:
 
-The final dataset is loaded into PostgreSQL for SQL-based analysis.
+- **Bronze**: raw ABS files ingested with minimal modification
+- **Silver**: cleaned and standardised intermediate datasets
+- **Gold**: final analytics-ready dataset prepared for warehouse loading
 
----
+The final warehouse table is:
 
-## Technology Stack
+```sql
+building_approvals_gold_batch
+```
 
-Python  
-Pandas  
-PostgreSQL  
-Docker  
-Git  
+## Tech Stack
 
-Python is used to implement the ETL pipeline and transformation logic.  
-Pandas is used for data processing and dataset manipulation.  
-PostgreSQL acts as the analytics database.  
-Docker runs the database locally in a containerised environment.
+- Python
+- Pandas
+- PostgreSQL
+- Apache Airflow
+- Docker
+- SQLAlchemy
+- openpyxl
 
----
+## Data Source
+
+Source data is based on Australian Bureau of Statistics building approvals datasets distributed as Excel workbooks.
 
 ## Project Structure
 
-```
-aussie-property-lakehouse
-
-data
- ├─ raw
- │   ├─ property_prices.csv
- │   └─ population_density.csv
- │
- └─ gold
-     └─ suburb_property_density_analysis.csv
-
-src
- ├─ etl
- │   ├─ bronze_layer.py
- │   └─ silver_layer.py
- │
- ├─ transform
- │   └─ build_gold_table.py
- │
- └─ pipeline
-     └─ run_pipeline.py
-
-docker-compose.yml
-requirements.txt
-README.md
+```text
+aussie-property-lakehouse/
+├── airflow/
+├── dags/
+├── data/
+│   ├── raw/
+│   ├── bronze/
+│   ├── silver/
+│   └── gold/
+├── src/
+│   ├── etl/
+│   ├── ingestion/
+│   ├── quality/
+│   ├── pipeline/
+│   └── transform/
+├── tests/
+├── docker-compose.yml
+└── README.md
 ```
 
----
+## How to Run
 
-## Running the Project
+Start the PostgreSQL warehouse:
 
-Start the PostgreSQL container:
-
-```
+```bash
 docker compose up -d
 ```
 
-Run the data pipeline:
+Start Airflow from the `airflow/` directory:
 
-```
-python3 -m src.pipeline.run_pipeline
-```
-
-The pipeline performs the following steps:
-
-1. Load raw property and population datasets  
-2. Clean and standardise the datasets  
-3. Merge the datasets into a unified analytical dataset  
-4. Generate derived metrics  
-5. Load the final dataset into PostgreSQL
-
----
-
-## Database Output
-
-The final analytical dataset is stored in the PostgreSQL table:
-
-```
-suburb_property_analysis
+```bash
+cd airflow
+docker compose up -d
 ```
 
-Table schema:
+Open Airflow:
 
-city  
-suburb  
-median_price  
-month  
-population_density  
-price_per_density  
-
-The `price_per_density` column represents a derived metric that compares housing prices relative to local population density.
-
----
-
-## Example SQL Query
-
-Retrieve all records from the analytical table:
-
-```
-SELECT *
-FROM suburb_property_analysis;
+```text
+http://localhost:8081
 ```
 
-Example analytical query:
+Trigger the DAG:
 
-```
-SELECT suburb, price_per_density
-FROM suburb_property_analysis
-ORDER BY price_per_density DESC;
+```text
+abs_building_approvals_pipeline
 ```
 
-This query highlights suburbs where housing prices are high relative to population density.
+## Example Validation
 
----
+Check that the final warehouse table has loaded successfully:
 
-## Example Output
+```sql
+SELECT COUNT(*) FROM building_approvals_gold_batch;
+```
 
-city        suburb      median_price    population_density    price_per_density
+Expected result in the current project setup:
 
-Sydney      Parramatta      1200000             3200               375  
-Sydney      Chatswood       1800000             4100               439  
-Melbourne   Box Hill        1350000             2900               465  
-Melbourne   Clayton          980000             2500               392  
+```text
+474
+```
 
----
+## Notes
+
+This project uses batch ingestion and a layered transformation approach to keep raw, cleaned, and curated datasets separate. The workflow is designed for reproducibility and local demonstration rather than production-scale deployment.
 
 ## Future Improvements
 
-Potential improvements for a production-level pipeline include:
+Possible next steps for extending the project:
 
-- Integrating Airflow for pipeline orchestration  
-- Storing raw data in cloud storage such as AWS S3  
-- Using dbt for transformation management  
-- Adding automated data validation and quality checks  
-- Building dashboards for downstream analytics
-
----
-
-## Author
-
-Leo Zhang  
-Master of Data Science  
-Monash University
-
-GitHub  
-https://github.com/leo-zhang101
+- replace local storage with S3-compatible object storage
+- add dbt for transformation modelling
+- add Great Expectations for richer data validation
+- implement dimensional warehouse modelling
+- add BI dashboard integration
