@@ -407,23 +407,19 @@ http://localhost:8080
 • Build a **feature store for fraud modeling**.
 ---
 
-# Resume Bullet Points
+## Resume Bullet Points
 
-Example resume descriptions for this project:
+• Designed and implemented a real-time streaming data pipeline using Apache Kafka and Spark Structured Streaming.
 
-• Designed and implemented a real-time financial transaction processing pipeline using Apache Kafka and Spark Structured Streaming.
+• Built a fraud detection engine processing **200k+ simulated payment events**.
 
-• Built a streaming data platform capable of processing over 200,000 simulated payment events.
+• Implemented streaming data quality monitoring including invalid record detection and duplicate transaction tracking.
 
-• Implemented rule-based fraud detection logic to classify high-risk, high-amount, and international transactions in real time.
+• Developed an analytical data warehouse in PostgreSQL for fraud monitoring queries.
 
-• Developed a PostgreSQL data warehouse to support analytical fraud monitoring queries.
+• Built interactive monitoring dashboards using Streamlit to visualize fraud metrics and system throughput.
 
-• Implemented dbt data models to structure warehouse tables and enable reproducible data transformations.
-
-• Orchestrated data workflows using Apache Airflow to automate streaming and transformation tasks.
+• Orchestrated streaming and transformation workflows using Apache Airflow.
 
 • Containerized the entire platform using Docker to enable reproducible local deployment.
-
-• Developed SQL analytics queries to analyze fraud rates, geographic patterns, and transaction risk distribution.
 
