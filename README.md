@@ -1,8 +1,10 @@
-# Aussie FinTech Streaming Pipeline
+# Real-Time Fintech Fraud Detection Streaming Pipeline
 
-This project is a real-time data engineering pipeline built with Apache Kafka, Apache Spark Structured Streaming, Docker, and PostgreSQL.
+An end-to-end real-time data engineering project that simulates payment transactions, streams them through Kafka, processes them using Spark Structured Streaming, and stores results in PostgreSQL for fraud analytics.
 
-It simulates a production-style transaction monitoring workflow that generates, processes, validates, and stores more than 10,000 payment events for downstream analytics.
+This project demonstrates how modern data platforms process **high-volume financial transactions in real time** and detect suspicious activities using rule-based fraud detection.
+
+---
 
 ## Project Goal
 
