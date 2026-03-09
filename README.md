@@ -134,6 +134,33 @@ real-time-fintech-fraud-pipeline
 | HIGH_AMOUNT | 39592 | 19.82% |
 | INTERNATIONAL | 12340 | 6.18% |
 | HIGH_RISK | 726 | 0.36% |
+
+## Performance Benchmark
+
+This streaming pipeline processes simulated financial transactions in real time.
+
+**Pipeline Performance**
+
+- Total streaming events processed: **200,000+**
+- Streaming processing engine: **Spark Structured Streaming**
+- Message broker: **Apache Kafka**
+- Data warehouse: **PostgreSQL**
+
+**System Capabilities**
+
+- Real-time fraud transaction detection
+- Streaming data ingestion from Kafka
+- Continuous processing with Spark Structured Streaming
+- Data warehousing using a star schema model
+- SQL analytics for fraud monitoring
+
+**Key Technologies**
+
+- Apache Kafka
+- Apache Spark Structured Streaming
+- PostgreSQL
+- Docker
+- Python
 ## Tech Stack
 
 - Python
