@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: raw
+    database: streaming_dw
+    schema: public
+    tables:
+      - name: payment_events_partitioned
+        description: Raw payment events loaded into partitioned PostgreSQL table
