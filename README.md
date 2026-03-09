@@ -43,6 +43,26 @@ Fraud Analytics Queries
 Airflow orchestrates the Kafka producer, streaming job, and dbt transformations.
 
 ---
+```mermaid
+flowchart LR
+    A[Transaction Generator] --> B[Kafka Producer]
+    B --> C[Kafka Topic: payment_events]
+    C --> D[Spark Structured Streaming]
+    D --> E[Fraud Detection Rules Engine]
+    E --> F[PostgreSQL Raw Table<br/>payment_events_stream]
+    F --> G[Partitioned Raw Layer<br/>payment_events_partitioned]
+    G --> H[dbt Source]
+    H --> I[dbt Staging Model<br/>stg_payment_events]
+    I --> J[dbt Mart Models]
+    J --> K[fact_transactions]
+    J --> L[dim_customer]
+    J --> M[dim_merchant]
+    J --> N[dim_state]
+    K --> O[Fraud Analytics SQL]
+    P[Airflow DAG] --> D
+    P --> I
+    P --> O
+```
 
 # Technology Stack
 
@@ -79,9 +99,33 @@ Analytics | SQL |
 
 ---
 
+```mermaid
+flowchart TB
+    A[Python Event Producer] --> B[Kafka Topic]
+    B --> C[Spark Structured Streaming Consumer]
+    C --> D[Apply Fraud Rules]
+    D --> E[Write to PostgreSQL]
+    E --> F[payment_events_stream]
+    F --> G[payment_events_partitioned]
+```
+
 # Data Model
 
 The warehouse uses a simplified analytical structure.
+
+```mermaid
+flowchart TB
+    A[raw.payment_events_partitioned] --> B[stg_payment_events]
+
+    B --> C[dim_customer]
+    B --> D[dim_merchant]
+    B --> E[dim_state]
+    B --> F[fact_transactions]
+
+    C --> F
+    D --> F
+    E --> F
+```
 
 ### Fact Table
 
@@ -276,6 +320,8 @@ http://localhost:8080
 ```
 
 ---
+
+
 
 # Engineering Highlights
 
