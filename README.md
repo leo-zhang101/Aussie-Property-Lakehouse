@@ -22,62 +22,87 @@ Key components:
 
 ---
 
-# Architecture
+## Architecture
 
-Transaction Generator  
-↓  
-Kafka Producer  
-↓  
-Kafka Topic (payment_events)  
-↓  
-Spark Structured Streaming  
-↓  
-Fraud Detection Rules  
-↓  
-PostgreSQL Warehouse  
-↓  
-dbt Data Models  
-↓  
-Fraud Analytics Queries  
+Producer (Python)
+        │
+        ▼
+Apache Kafka (Event Stream)
+        │
+        ▼
+Spark Structured Streaming
+        │
+        ├── Fraud Detection Rules
+        ├── Data Validation
+        ├── Data Quality Metrics
+        │
+        ▼
+PostgreSQL
+   ├── payment_events_stream
+   ├── payment_metrics_stream
+   ├── data_quality_metrics
+   └── fraud_alerts
+        │
+        ▼
+Streamlit Dashboard
+        │
+        ▼
+Airflow Scheduling
 
-Airflow orchestrates the Kafka producer, streaming job, and dbt transformations.
+## Tech Stack
+
+### Data Ingestion
+- Apache Kafka (Real-time event streaming)
+- Python Kafka Producer (Simulated payment events)
+
+### Stream Processing
+- Apache Spark Structured Streaming
+- Micro-batch processing
+- Fraud detection rule engine
+- Data validation pipeline
+
+### Data Storage
+- PostgreSQL
+- Streaming sink tables
+- Partitioned tables for event storage
+
+### Data Quality Monitoring
+- Invalid record detection
+- Duplicate transaction detection
+- Data quality metrics tracking
+
+### Alerting System
+- Real-time fraud rate monitoring
+- Alert thresholds
+- Fraud spike detection
+
+### Workflow Orchestration
+- Apache Airflow
+- Automated streaming pipeline scheduling
+
+### Monitoring Dashboard
+- Streamlit
+- Real-time metrics visualization
+- Fraud trend monitoring
+- Transaction throughput monitoring
+
+### Infrastructure
+- Docker
+- Containerized PostgreSQL
+- Local streaming environment
 
 ---
-```mermaid
-flowchart LR
-    A[Transaction Generator] --> B[Kafka Producer]
-    B --> C[Kafka Topic: payment_events]
-    C --> D[Spark Structured Streaming]
-    D --> E[Fraud Detection Rules Engine]
-    E --> F[PostgreSQL Raw Table<br/>payment_events_stream]
-    F --> G[Partitioned Raw Layer<br/>payment_events_partitioned]
-    G --> H[dbt Source]
-    H --> I[dbt Staging Model<br/>stg_payment_events]
-    I --> J[dbt Mart Models]
-    J --> K[fact_transactions]
-    J --> L[dim_customer]
-    J --> M[dim_merchant]
-    J --> N[dim_state]
-    K --> O[Fraud Analytics SQL]
-    P[Airflow DAG] --> D
-    P --> I
-    P --> O
-```
 
-# Technology Stack
+## Pipeline Features
 
-| Layer | Technology |
-|------|-------------|
-Streaming | Apache Kafka |
-Processing | Spark Structured Streaming |
-Programming | Python |
-Data Warehouse | PostgreSQL |
-Data Modeling | dbt |
-Orchestration | Apache Airflow |
-Containerization | Docker |
-Analytics | SQL |
-
----
+- Real-time payment event ingestion via Kafka
+- Streaming fraud detection using Spark Structured Streaming
+- Batch-level fraud metrics computation
+- Data quality monitoring (invalid records, duplicates)
+- Real-time alert generation based on fraud thresholds
+- PostgreSQL sink for streaming analytics
+- Interactive monitoring dashboard with Streamlit
+- Workflow orchestration with Apache Airflow
 
 # Pipeline Flow
 
@@ -109,23 +134,45 @@ flowchart TB
     F --> G[payment_events_partitioned]
 ```
 
-# Data Model
+## Data Model
 
-The warehouse uses a simplified analytical structure.
+### payment_events_stream
+Stores validated streaming payment events.
 
-```mermaid
-flowchart TB
-    A[raw.payment_events_partitioned] --> B[stg_payment_events]
+Key fields:
+- transaction_id
+- event_ts
+- amount
+- state
+- risk_score
+- fraud_flag
 
-    B --> C[dim_customer]
-    B --> D[dim_merchant]
-    B --> E[dim_state]
-    B --> F[fact_transactions]
+### payment_metrics_stream
+Batch-level fraud monitoring metrics.
 
-    C --> F
-    D --> F
-    E --> F
-```
+Fields:
+- metric_ts
+- total_transactions
+- fraud_transactions
+- fraud_rate
+
+### data_quality_metrics
+Tracks streaming data quality.
+
+Fields:
+- total_records
+- valid_records
+- invalid_records
+- duplicate_transaction_count
+
+### fraud_alerts
+Triggered when fraud thresholds are exceeded.
+
+Fields:
+- alert_ts
+- alert_type
+- fraud_rate
+- severity
 
 # Airflow Orchestration
 ```mermaid
@@ -135,7 +182,19 @@ flowchart LR
     C --> D[dbt test]
     D --> E[Fraud Analytics Ready]
 ```
+## Dashboard
 
+### Fraud Monitoring Dashboard
+
+![Dashboard](images/dashboard.png)
+
+Features:
+- Fraud rate trend
+- Transactions per batch
+- Global fraud metrics
+- Fraud distribution by state
+- Data quality monitoring
+- Fraud alerts
 
 ### Fact Table
 
