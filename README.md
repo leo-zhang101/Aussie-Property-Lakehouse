@@ -46,6 +46,7 @@ G --> I[dbt Warehouse Models]
 I --> J[Analytics Queries]
 
 J --> K[Airflow Scheduling]
+```
 
 ## Tech Stack
 
