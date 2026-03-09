@@ -1,202 +1,120 @@
-# Real-Time Fintech Fraud Detection Streaming Pipeline
+# Real-Time FinTech Fraud Detection Pipeline
 
-An end-to-end real-time data engineering project that simulates payment transactions, streams them through Kafka, processes them using Spark Structured Streaming, and stores results in PostgreSQL for fraud analytics.
+This project simulates a real-time financial transaction system and demonstrates how a modern data platform processes and analyzes streaming payment events.
 
-This project demonstrates how modern data platforms process **high-volume financial transactions in real time** and detect suspicious activities using rule-based fraud detection.
+Transactions are generated continuously, streamed through Apache Kafka, processed using Spark Structured Streaming, and stored in PostgreSQL for downstream analytics and fraud monitoring.
+
+The platform also includes Airflow orchestration, dbt data modeling, and a fraud analytics layer.
 
 ---
 
-## Project Goal
+# System Overview
 
-The objective of this project is to build an advanced streaming data platform that demonstrates:
+This pipeline represents a simplified version of how fintech platforms monitor transaction risk in real time.
 
-- real-time transaction event generation
-- Kafka-based event ingestion
-- Spark Structured Streaming transformation
-- data quality validation
-- PostgreSQL warehouse loading
-- SQL-based analytics on streaming data
-# Real-Time Fintech Fraud Streaming Pipeline
+Key components:
 
-##Technology Stack
-<img width="1008" height="648" alt="image" src="https://github.com/user-attachments/assets/e183a1bf-ffb5-4c97-a305-07a600a71c62" />
+- streaming event ingestion
+- real-time data processing
+- fraud detection rules
+- analytical data warehouse
+- pipeline orchestration
 
-This project simulates a real-time payment fraud detection pipeline using Kafka, Spark Structured Streaming, and PostgreSQL.
+---
 
-## Architecture
-![Pipeline Architecture](docs/architecture/pipeline_architecture.png)
-```mermaid
-flowchart TD
-    subgraph Ingestion
-        A[Python Producer]
-        B[Kafka Topic: payment_events_v2]
-    end
+# Architecture
 
-    subgraph Streaming
-        C[Spark Structured Streaming]
-    end
+Transaction Generator  
+↓  
+Kafka Producer  
+↓  
+Kafka Topic (payment_events)  
+↓  
+Spark Structured Streaming  
+↓  
+Fraud Detection Rules  
+↓  
+PostgreSQL Warehouse  
+↓  
+dbt Data Models  
+↓  
+Fraud Analytics Queries  
 
-    subgraph Raw_Storage
-        D[payment_events_stream]
-        E[payment_metrics_stream]
-    end
+Airflow orchestrates the Kafka producer, streaming job, and dbt transformations.
 
-    subgraph Warehouse
-        F[fact_transactions]
-        G[dim_customer]
-        H[dim_merchant]
-        I[dim_state]
-    end
+---
 
-    subgraph Analytics
-        J[Fraud rate by state]
-        K[Top high-risk transactions]
-        L[International vs domestic fraud]
-    end
+# Technology Stack
 
-    A --> B
-    B --> C
-    C --> D
-    C --> E
-    D --> F
-    D --> G
-    D --> H
-    D --> I
-    F --> J
-    F --> K
-    F --> L
-    H --> J
-    I --> J
-```
-## Target Scale
+| Layer | Technology |
+|------|-------------|
+Streaming | Apache Kafka |
+Processing | Spark Structured Streaming |
+Programming | Python |
+Data Warehouse | PostgreSQL |
+Data Modeling | dbt |
+Orchestration | Apache Airflow |
+Containerization | Docker |
+Analytics | SQL |
 
-- 10,000+ streaming events
-- multi-attribute transaction records
-- real-time ingestion and processing
-- persistent storage for SQL analytics
+---
 
-## Planned Architecture
+# Pipeline Flow
 
-```text
-Transaction Generator
-      ↓
-Kafka Producer
-      ↓
-Kafka Topic
-      ↓
-Spark Structured Streaming
-      ↓
-Validation / Fraud Rules
-      ↓
-PostgreSQL Warehouse
-      ↓
-SQL Analytics
-```
-## Project Structure
+1. A Python transaction generator simulates payment events.
 
-```
-real-time-fintech-fraud-pipeline
-│
-├── docker
-│   └── docker-compose.yml
-│
-├── src
-│   ├── producer
-│   │   └── event_producer.py
-│   │
-│   └── streaming
-│       └── spark_streaming_consumer.py
-│
-├── sql
-│   ├── create_tables.sql
-│   └── analytics_queries.sql
-│
-├── docs
-│   └── architecture.md
-│
-├── README.md
-└── requirements.txt
-```
-## Sample Analytics Results
+2. Events are sent to Kafka via a producer.
 
-## Fraud Analytics Results
+3. Spark Structured Streaming consumes the Kafka topic.
 
-### Fraud Transactions by State
+4. Fraud rules classify transactions in real time.
 
-| State | Total Transactions | Fraud Transactions |
-|------|------|------|
-| WA | 33199 | 8906 |
-| QLD | 33570 | 8839 |
-| TAS | 33513 | 8750 |
-| NSW | 33219 | 8747 |
-| SA | 33032 | 8720 |
-| VIC | 33244 | 8696 |
+5. Cleaned transactions are written to PostgreSQL.
 
-### Top High-Risk Transactions
+6. dbt models build warehouse tables.
 
-Example query used to identify the highest risk transactions:
+7. SQL queries power fraud monitoring and reporting.
 
-```sql
-SELECT
-transaction_id,
-event_ts,
-customer_id,
-merchant_id,
-state,
-amount,
-currency,
-risk_score,
-fraud_flag
-FROM fact_transactions
-WHERE fraud_flag = 'HIGH_RISK'
-ORDER BY risk_score DESC, amount DESC
-LIMIT 10;
+8. Airflow orchestrates scheduled workflows.
 
-### Fraud Category Distribution
+---
 
-| Fraud Type | Total Transactions | Percentage |
-|------|------|------|
-| NORMAL | 147119 | 73.64% |
-| HIGH_AMOUNT | 39592 | 19.82% |
-| INTERNATIONAL | 12340 | 6.18% |
-| HIGH_RISK | 726 | 0.36% |
+# Data Model
 
-## Performance Benchmark
+The warehouse uses a simplified analytical structure.
 
-This streaming pipeline processes simulated financial transactions in real time.
+### Fact Table
 
-**Pipeline Performance**
+fact_transactions
 
-- Total streaming events processed: **200,000+**
-- Streaming processing engine: **Spark Structured Streaming**
-- Message broker: **Apache Kafka**
-- Data warehouse: **PostgreSQL**
+| column | description |
+|------|------|
+transaction_id | unique transaction id |
+event_ts | event timestamp |
+customer_id | customer identifier |
+merchant_id | merchant identifier |
+amount | payment amount |
+currency | transaction currency |
+state | Australian state |
+risk_score | fraud risk score |
+fraud_flag | fraud classification |
 
-**System Capabilities**
+---
 
-- Real-time fraud transaction detection
-- Streaming data ingestion from Kafka
-- Continuous processing with Spark Structured Streaming
-- Data warehousing using a star schema model
-- SQL analytics for fraud monitoring
+# Fraud Detection Rules
 
-**Key Technologies**
+Fraud classification is implemented inside the Spark streaming job.
 
-- Apache Kafka
-- Apache Spark Structured Streaming
-- PostgreSQL
-- Docker
-- Python
-## Tech Stack
+HIGH_RISK → risk_score > 0.8  
+HIGH_AMOUNT → amount > 4000 AUD  
+INTERNATIONAL → is_international = true  
+NORMAL → otherwise  
 
-- Python
-- Apache Kafka
-- Apache Spark Structured Streaming
-- Docker
-- PostgreSQL
-- SQLAlchemy
+These rules simulate a simplified fraud detection engine used in payment platforms.
 
-## Example Event Model
+---
+
+# Example Transaction Event
 
 ```json
 {
@@ -218,46 +136,9 @@ This streaming pipeline processes simulated financial transactions in real time.
 }
 ```
 
-## Project Structure
-
-```text
-kafka-streaming-pipeline/
-├── README.md
-├── requirements.txt
-├── docker/
-│   └── docker-compose.yml
-├── src/
-│   ├── producer/
-│   ├── streaming/
-│   ├── warehouse/
-│   ├── quality/
-│   └── utils/
-├── data/
-│   ├── raw/
-│   └── checkpoints/
-├── docs/
-│   └── architecture/
-└── sql/
-    └── init.sql
-```
 ---
 
-## Fraud Detection Logic
-
-Fraud classification is implemented using rule-based logic inside the Spark Structured Streaming job.
-
-Rules include:
-
-- HIGH_RISK → risk_score > 0.8
-- HIGH_AMOUNT → transaction amount > 4000 AUD
-- INTERNATIONAL → transaction marked as international
-- NORMAL → all other transactions
-
-This simulates a simplified real-world fraud detection engine used by fintech companies.
-
----
-
-## Example Fraud Analytics Queries
+# Example Analytics Queries
 
 ### Fraud Rate by State
 
@@ -273,28 +154,147 @@ SELECT
 FROM fact_transactions
 GROUP BY state
 ORDER BY fraud_rate DESC;
-###International vs Domestic Fraud
+```
+
+### International Fraud Comparison
+
+```sql
 SELECT
     is_international,
     COUNT(*) AS total_transactions,
-    SUM(CASE WHEN fraud_flag <> 'NORMAL' THEN 1 ELSE 0 END) AS fraud_transactions,
-    ROUND(
-        SUM(CASE WHEN fraud_flag <> 'NORMAL' THEN 1 ELSE 0 END)::numeric / COUNT(*),
-        4
-    ) AS fraud_rate
+    SUM(CASE WHEN fraud_flag <> 'NORMAL' THEN 1 ELSE 0 END) AS fraud_transactions
 FROM fact_transactions
 GROUP BY is_international;
-Key Engineering Highlights
-	Built an end-to-end streaming data pipeline
-	Processed 200,000 simulated payment transactions
-	Implemented Kafka event ingestion
-	Implemented Spark Structured Streaming transformations
-	Designed a star schema warehouse model
-	Built analytical SQL fraud detection queries
-	Handled duplicate key conflicts and streaming batch writes
-## Status
+```
 
-Project setup in progress.
+---
 
-Next step:
-- implement a Kafka producer for real-time transaction events
+# Pipeline Performance
+
+This pipeline processes simulated financial transactions in real time.
+
+Processing metrics:
+
+- events processed: 200,000+
+- streaming engine: Spark Structured Streaming
+- message broker: Kafka
+- storage layer: PostgreSQL
+
+System capabilities:
+
+- continuous streaming ingestion
+- rule-based fraud classification
+- structured warehouse storage
+- analytical fraud monitoring
+
+---
+
+# Project Structure
+
+```
+real-time-fintech-fraud-pipeline
+
+├── README.md
+├── requirements.txt
+│
+├── docker
+│   └── docker-compose.yml
+│
+├── airflow
+│   └── dags
+│       └── fraud_pipeline_dag.py
+│
+├── dbt
+│   └── models
+│       └── fact_transactions.sql
+│
+├── src
+│   ├── producer
+│   │   └── event_producer.py
+│   │
+│   ├── streaming
+│   │   └── spark_streaming_consumer.py
+│   │
+│   ├── warehouse
+│   └── utils
+│
+├── sql
+│   ├── create_tables.sql
+│   └── analytics_queries.sql
+│
+└── data
+    ├── raw
+    └── checkpoints
+```
+
+---
+
+# Running the Pipeline
+
+### Clone repository
+
+```
+git clone https://github.com/yourusername/real-time-fintech-fraud-pipeline.git
+cd real-time-fintech-fraud-pipeline
+```
+
+### Start infrastructure
+
+```
+docker compose up -d
+```
+
+This launches:
+
+- Kafka
+- Zookeeper
+- PostgreSQL
+- Airflow
+
+### Run transaction generator
+
+```
+python src/producer/event_producer.py
+```
+
+### Start streaming job
+
+```
+spark-submit src/streaming/spark_streaming_consumer.py
+```
+
+### Run dbt models
+
+```
+dbt run
+```
+
+### Airflow UI
+
+```
+http://localhost:8080
+```
+
+---
+
+# Engineering Highlights
+
+- built an end-to-end real-time streaming data pipeline
+- processed over 200k simulated financial transactions
+- implemented Kafka event ingestion
+- implemented Spark Structured Streaming processing
+- designed a PostgreSQL analytical warehouse
+- implemented dbt transformations
+- orchestrated workflows with Airflow
+- containerized the platform using Docker
+
+---
+
+# Future Improvements
+
+Possible extensions:
+
+- machine learning fraud models
+- real-time monitoring dashboards
+- cloud deployment (AWS / GCP)
+- streaming feature store
