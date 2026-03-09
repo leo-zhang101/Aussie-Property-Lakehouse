@@ -127,6 +127,16 @@ flowchart TB
     E --> F
 ```
 
+# Airflow Orchestration
+```mermaid
+flowchart LR
+    A[Start DAG] --> B[Run Streaming Validation]
+    B --> C[dbt run]
+    C --> D[dbt test]
+    D --> E[Fraud Analytics Ready]
+```
+
+
 ### Fact Table
 
 fact_transactions
