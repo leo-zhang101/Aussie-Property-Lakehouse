@@ -120,7 +120,7 @@ I --> J[Airflow Orchestration]
 - Interactive monitoring dashboard with Streamlit
 - Workflow orchestration with Apache Airflow
 
-```markdown
+
 ## System Metrics
 
 This pipeline simulates a real-time financial transaction platform and processes streaming payment events continuously.
@@ -146,6 +146,7 @@ System capabilities:
 - real-time analytics dashboard
 
 ---
+
 ```mermaid
 flowchart TB
     A[Python Event Producer] --> B[Kafka Topic]
