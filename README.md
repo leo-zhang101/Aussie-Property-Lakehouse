@@ -46,7 +46,32 @@ G --> I[dbt Warehouse Models]
 I --> J[Analytics Queries]
 
 J --> K[Airflow Scheduling]
+
 ```
+---
+
+## Streaming Pipeline Flow
+
+```mermaid
+flowchart LR
+
+A[Transaction Generator<br>Python Producer] --> B[Kafka Topic<br>payment_events]
+
+B --> C[Spark Structured Streaming]
+
+C --> D[Fraud Detection Engine]
+
+D --> E[Data Validation]
+
+E --> F[Data Quality Monitoring]
+
+F --> G[(PostgreSQL Warehouse)]
+
+G --> H[Streamlit Fraud Dashboard]
+
+G --> I[dbt Analytics Models]
+
+I --> J[Airflow Orchestration]
 
 ## Tech Stack
 
@@ -93,26 +118,32 @@ J --> K[Airflow Scheduling]
 - Interactive monitoring dashboard with Streamlit
 - Workflow orchestration with Apache Airflow
 
-# Pipeline Flow
+```markdown
+## System Metrics
 
-1. A Python transaction generator simulates payment events.
+This pipeline simulates a real-time financial transaction platform and processes streaming payment events continuously.
 
-2. Events are sent to Kafka via a producer.
+Key performance metrics:
 
-3. Spark Structured Streaming consumes the Kafka topic.
+| Metric | Value |
+|------|------|
+| Transactions processed | 200,000+ |
+| Streaming engine | Apache Spark Structured Streaming |
+| Event broker | Apache Kafka |
+| Storage layer | PostgreSQL |
+| Streaming model | Micro-batch processing |
+| Fraud detection | Rule-based classification |
+| Dashboard refresh | Real-time monitoring |
 
-4. Fraud rules classify transactions in real time.
+System capabilities:
 
-5. Cleaned transactions are written to PostgreSQL.
-
-6. dbt models build warehouse tables.
-
-7. SQL queries power fraud monitoring and reporting.
-
-8. Airflow orchestrates scheduled workflows.
+- continuous event ingestion
+- real-time fraud classification
+- batch-level fraud metrics generation
+- streaming data quality monitoring
+- real-time analytics dashboard
 
 ---
-
 ```mermaid
 flowchart TB
     A[Python Event Producer] --> B[Kafka Topic]
