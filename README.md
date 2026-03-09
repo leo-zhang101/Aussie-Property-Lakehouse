@@ -175,7 +175,9 @@ flowchart LR
 
 ### Fraud Monitoring Dashboard
 
-![Dashboard](images/dashboard.png)
+![Fraud Monitoring Dashboard](images/dashboard.png)
+
+---
 
 Features:
 - Fraud rate trend
